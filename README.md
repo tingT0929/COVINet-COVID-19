@@ -58,7 +58,7 @@ The variable importance results in the random forest are modeled based on the cu
 
 Comparison of the performance of COVINet and 10 CDC models in predicting the disease dynamics at the county level using the MAE and MRE as the evaluation metrics. The results are reported for the top 10 states and all states in the US for a 7-day prediction horizon.
 
-| |Top Ten States | Top Ten States| All States|All States |
+| |Top 10 States | Top 10 States| All States|All States |
 |--------------------|----------------------------|---------------------------------------------|--------------------|---------------------|
 | **Method**                  | **MAE**$_7$      | **MRE**${}_7$    | **MAE**${}_7$ | **MRE**${}_7$ |
 | COVINet(Our Proposed Model)                    | **125.00**                            | **0.0039**                         | **54.45**   | 0.0097             |
