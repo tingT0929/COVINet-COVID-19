@@ -12,3 +12,8 @@ For confirmed deaths prediction, run the model by
 ```shell
 python lstm_cov_factor_server.py --target 1
 ```
+
+For altering seed(eg. setting seed to 1), run the model by
+```shell
+python lstm_cov_factor_server.py --target 1 --seed 1
+```
