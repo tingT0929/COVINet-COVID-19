@@ -1,5 +1,4 @@
-------------------------------------
-code_rf_mre.R
-------------------------------------
-The random forest model was used for training and prediction, the calculation of the importance of variables. And the accuracy and MREs on the test set was calculated.
+## R code
+
+Codes here can be used for modeling with random forests and obtained the variable importance of all covariates.
 
