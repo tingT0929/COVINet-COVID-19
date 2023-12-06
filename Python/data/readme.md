@@ -1,5 +1,11 @@
 Run the model to save output in folder data. 
-To obtain MRE7 and MRE30, run
+
+To obtain COVINet's MAE7 and MRE7 of Table 2, run
+```
+python metric_cal.py
+```
+
+To obtain MRE7 and MRE30 of Table 3, run
 ```
 python MRE_cal.py
 ```
