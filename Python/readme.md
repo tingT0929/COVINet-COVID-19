@@ -17,3 +17,8 @@ For altering seed(eg. setting seed to 1), run the model by
 ```shell
 python lstm_cov_factor_server.py --target 1 --seed 1
 ```
+
+For model comparison, run the model by
+```shell
+python lstm_cov_factor_server.py --target 1 --seed 1 --limit_date '2021-04-26'
+```
