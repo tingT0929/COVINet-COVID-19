@@ -34,6 +34,7 @@ parser.add_argument('--file_dataset', type = str, default= 'data-14-new.csv')
 parser.add_argument('--model', type = str, default='model')
 parser.add_argument('--seed', type = int, default = 0)
 parser.add_argument('--target', type = int, default = 1) # 0 for cases and 1 for deaths
+parser.add_argument('--limit_date', type = str, default = '')
 
 args = parser.parse_args()
 file_dataDF = args.file_dataDF
@@ -41,9 +42,7 @@ file_dataset = args.file_dataset
 model_type = args.model
 seed = args.seed
 target = args.target
-
-print(file_dataDF)
-print(file_dataset)
+limit_date = args.limit_date
 path = '~./data'
 os.chdir(path)
 
@@ -58,10 +57,10 @@ remain_day = 7 * 8
 testLen = 40
 stayCol = ['Average Daily PM2.5', 'Average Traffic Volume per Meter of Major Roadways', '% Severe Housing Problems', 'LON', 'LAT']
 top10states = ['Florida', 'Louisiana', 'Connecticut', 'California', 'Michigan', 'Pennsylvania', 'Illinois', 'Massachusetts', 'New Jersey', 'New York']
-##############################
 
 dataset = pd.read_csv(file_dataset)
-#dataset = dataset[dataset['date'] <= '2022-04-26']
+if len(limit_date):
+    dataset = dataset[dataset['date'] <= limit_date]
 print(dataset.columns)
 
 
@@ -92,7 +91,6 @@ print("top_10_county:", top_10_county)
 top_10_county = ['Florida Miami-Dade', 'Louisiana Jefferson', 'Connecticut Fairfield', 'California Los Angeles', 'Michigan Wayne', 'Pennsylvania Philadelphia', 'Illinois Cook', 'Massachusetts Middlesex', 'New Jersey Bergen', 'New York New York City']
 print("scaler loaded...")
 
-##################################
 trainMainDF, trainAuxDF, trainYDF, valMainDF, valAuxDF, valYDF, dataset_or, state, state_train, state_test = get_train_data(dataset, latLongDF,
                                                                  scalerCOVID, scalerFactor,
                                                                  scalerLatLong, look_back,
@@ -105,13 +103,7 @@ tempTime = datasetDF['date'].unique()
 tempTime = np.sort(tempTime)
 
 
-##################################
-outWeights = pd.DataFrame([[0.0]*3]*1,
-                          columns = ['Factor', 'case', 'death'])
-
 save_path = path + '/result/cov_factor_0621_single'
-##################
-#count = 0
 
 model = factor_model(trainMainDF, trainAuxDF, trainYDF, valMainDF, valAuxDF, valYDF, 
                                                              dataset_or, save_path, 
@@ -124,44 +116,28 @@ print("weight", weight_Dense_1[-5:, :])
 stayColWeight = weight_Dense_1[-1]
 
 stayFactorColname = stayCol
-
-
-datasetDF = dataset.reset_index(drop = True)
 changeFactor = [0.5, 1, 2, 3, 4]
 
 
-dataset, dataDF = data_process(dataset, dataDF)
-date_list = []
-pre30_ = []
-true_ = []
-
-date_list = []
-state_name = []
-pre30_ = []
-true_ = []
-cf_list = []
-cfi_list = []
-county_list = []
-for sc_ in top_10_county:
-    print(sc_)
-    trainMainDF, trainAuxDF, trainYDF, date, stateName = get_county_data(dataset, latLongDF, stayCol, state, scalerCOVID, scalerFactor, scalerLatLong, sc_, look_back,remain_day, sd_list[sd])
-    for cfi in range(3):
-        for cf in changeFactor:
-            pre30, true = predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, 0, cfi, cf)
-            pre30_.append(pre30)
-            true_.append(true[:,0])
-            date_list.append(date)
-            cf_list.append(cf)
-            cfi_list.append(cfi)
+for start_index in range(6):
+    date_list = []
+    pre30_ = []
+    true_ = []
+    for sc_ in top_10_county:
+        print(sc_)
+        trainMainDF, trainAuxDF, trainYDF, date, stateName = get_county_data(dataset, latLongDF, stayCol, state, scalerCOVID, scalerFactor, scalerLatLong, sc_, look_back,remain_day)
+        for cfi in range(3):
+            for cf in changeFactor:
+                pre30, true = predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, start_index, cfi, cf)
+                pre30_.append(pre30)
+                true_.append(true[:,0])
+                date_list.append(date)
 
     date_list = np.array(date_list)
-    np.save(path + '/data/changefactor/date_' + str(sd) + '_' + str(seed) + '_' + str(target) +'.npy', date_list)
+    np.save('/public/home/tianting/lstm/data/changefactor/date_' + str(start_index) + '_' + str(seed) + '_' + str(target) +'.npy', date_list)
     pre30_ = np.array(pre30_)
-    np.save('/public/home/tianting/lstm/data/changefactor/pre30_'+ str(sd) + '_' + str(seed) + '_'+ str(target) +  '.npy', pre30_)
+    np.save('/public/home/tianting/lstm/data/changefactor/pre30_'+ str(start_index) + '_' + str(seed) + '_'+ str(target) +  '.npy', pre30_)
     true_ = np.array(true_)
-    np.save('/public/home/tianting/lstm/data/changefactor/true_' + str(sd) + '_' + str(seed) + '_'+ str(target) +  '.npy', true_)
-    cf_list = np.array(cf_list)
-    np.save('/public/home/tianting/lstm/data/changefactor/cflist_'+ str(sd) + '_' + str(seed) + '_'+ str(target) +  '.npy', cf_list)
-    cfi_list = np.array(cfi_list)
+    np.save('/public/home/tianting/lstm/data/changefactor/true_' + str(start_index) + '_' + str(seed) + '_'+ str(target) +  '.npy', true_)
     np.save('/public/home/tianting/lstm/data/changefactor/cfilist_' + str(sd) + '_' + str(seed) + '_'+ str(target) +  '.npy', cfi_list)
 
