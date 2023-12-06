@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 28 21:24:39 2020
-
-@author: zhang
-"""
-#import keras
-#import tensorflow as tf
-#config = tf.ConfigProto()
-#config.gpu_options.allow_growth = True
-#keras.backend.tensorflow_backend.set_session(tf.Session(config=config))
-
 import numpy as np
 import pandas as pd
 import math
@@ -504,7 +493,7 @@ def get_county_data(datasetDF, latLongDF, stayCol, state,
     return trainMainDF, trainAuxDF, trainYDF, date, stateName
     
 
-def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, start_index = 0, change_factor_index = 0, change_factor = 1):
+def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, start_index = 0, change_factor_index = 0, change_factor = 1, sd = None):
                        
     if start_index + 50 > len(trainYDF):
         print("no true value error...")
