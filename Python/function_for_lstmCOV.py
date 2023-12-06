@@ -493,8 +493,7 @@ def get_county_data(datasetDF, latLongDF, stayCol, state,
     return trainMainDF, trainAuxDF, trainYDF, date, stateName
     
 
-def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, start_index = 0, change_factor_index = 0, change_factor = 1, sd = None):
-                       
+def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_day, scalerCOVID, state, stateName, look_back, start_index = 0, change_factor_index = 0, change_factor = 1):   
     if start_index + 50 > len(trainYDF):
         print("no true value error...")
         return np.zeros(30), np.zeros(30)
@@ -502,6 +501,7 @@ def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_d
     
         start_index = int(start_index)
         testx = [0.]*(51)
+        #testx[0:14] = trainMainDF.iloc[start_index, :]
         for i in range(look_back):
             testx[i] = trainMainDF.iloc[start_index, i]
         for i in range(7):
@@ -515,6 +515,7 @@ def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_d
             testxx = testx[i:(i+look_back)]
             testxx = np.reshape(testxx, (1, 1, look_back))
             testy = model.predict([testxx, testx_factor], verbose = 0)
+            #print(i, testy)
             testx[look_back + 7 + i] = testy.tolist()[0][0]
     
         testx = np.array(testx).reshape(-1, 1)
@@ -522,5 +523,7 @@ def predict_county(model, save_path, trainMainDF, trainAuxDF, trainYDF, remain_d
         scaler_ = scalerCOVID[index[0]]
         testx = scaler_.inverse_transform(testx)
         trainYDF = scaler_.inverse_transform(trainYDF)
+        print(testx)
+        return testx, trainYDF
     
         return testx, trainYDF
